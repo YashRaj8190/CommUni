@@ -1,8 +1,20 @@
 import { Button } from '@chakra-ui/react';
 import React from 'react'
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Homepage = () => {
+    const history = useHistory();
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("userInfo"));
+
+        if (!user){
+            history.push('/');
+        }
+    }, [history]);
+
     return (
         <div>
             <nav className='flex items-center justify-between py-4 px-6 bg-slate-800'>
