@@ -1,12 +1,11 @@
+import React from 'react';
 import { Avatar, Text } from "@chakra-ui/react";
-import { ChatState } from "../../Context/chatProvider"
 
-const UserListItem = ({user, handleFunction}) => {
-
+const UserListItem = ({ user, handleFunction }) => {
     return (
         <div
             onClick={handleFunction}
-            style={{cursor:"pointer", width: "100%", display: "flex", alignItems: "center", color: "black"}}
+            style={{ cursor: "pointer", width: "100%", display: "flex", alignItems: "center", color: "black" }}
         >
             <Avatar
                 mr={2}
