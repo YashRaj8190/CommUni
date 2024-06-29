@@ -1,8 +1,10 @@
 import React from 'react'
 import { ChatState } from '../Context/chatProvider'
 import { Box, IconButton, Text } from '@chakra-ui/react'
-import { ArrowBackIcon } from '@chakra-ui/icons'
 import { getSender, getSenderFull } from './config/chatLogic'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import UpdateGroup from './UpdateGroup'
 import Profile from './Profile'
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -14,8 +16,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     <Text pb={3} px={3} fontSize={{ base: "28px", md: "30px" }} fontFamily="Work sans" w="100%" display="flex" alignItems="center" justifyContent={{ base: "space-between" }}>
                         <IconButton
                             d={{ base: "flex", md: "none" }}
-                            icon={<ArrowBackIcon />}
-                            onClick={() => setSelectedChat("")} />
+                            icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                            onClick={() => setSelectedChat("")}
+                        />
                         {!selectedChat.isGroupChat ? (
                             <>
                                 {getSender(user, selectedChat.users)}
@@ -24,9 +27,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         ) : (
                             <>
                                 {selectedChat.chatName.toUpperCase()}
+                                <UpdateGroup fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
                             </>
                         )}
                     </Text>
+                    <Box
+                        display="flex"
+                        flexDir="column" justifyContent="flex-end" h="100%" w="100%" p={3}
+                        bg="#E8E8E8"
+                        borderRadius="lg" overflow="hidden">
+
+                    </Box>
                 </>
             ) : (
                 <Box display="flex" alignItems="center" justifyContent="center" h="100%">

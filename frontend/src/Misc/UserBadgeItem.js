@@ -9,6 +9,7 @@ const UserBadgeItem = ({ user, handleFunction }) => {
             cursor="pointer" fontSize={12}
             backgroundColor='purple'
             onClick={handleFunction}
+            display="flex"
         >
             {user.name}
             <CloseButton pl={1} />
