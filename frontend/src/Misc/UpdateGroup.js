@@ -19,7 +19,7 @@ import { ChatState } from '../Context/chatProvider';
 import UserBadgeItem from './UserBadgeItem';
 import UserListItem from './UserListItem';
 
-const UpdateGroup = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroup = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [groupChatName, setGroupChatName] = useState();
     const [search, setSearch] = useState("");
@@ -66,6 +66,7 @@ const UpdateGroup = ({ fetchAgain, setFetchAgain }) => {
             );
             u._id === user._id ? setSelectedChat() : setSelectedChat(data);
             setFetchAgain(!fetchAgain);
+            fetchMessages();
             setLoad(false);
         } catch (error) {
             toast({
@@ -169,7 +170,7 @@ const UpdateGroup = ({ fetchAgain, setFetchAgain }) => {
                 },
             };
             const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
-            console.log(data);
+            //console.log(data);
             setLoad(false);
             setSearchResult(data);
         } catch (error) {
