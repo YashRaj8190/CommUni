@@ -22,12 +22,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
 
-    const { user, selectedChat, setSelectedChat } = ChatState();
+    const { user, selectedChat, setSelectedChat, notification, setNotification } = ChatState();
     const toast = useToast();
 
     const fetchMessages = async () => {
-        if (!selectedChat)return;
-        
+        if (!selectedChat) return;
+
         try {
             const config = {
                 headers: {
@@ -37,8 +37,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
             setLoading(true);
 
-            const {data} = await axios.get(`http://localhost:5000/api/message/${selectedChat._id}`, config);
-            
+            const { data } = await axios.get(`http://localhost:5000/api/message/${selectedChat._id}`, config);
+
             //console.log(messages);
             setMessages(data);
             setLoading(false);
@@ -70,10 +70,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         selectedChatCompare = selectedChat;
     }, [selectedChat]);
 
+    // console.log(notification);
     useEffect(() => {
         socket.on('message recieved', (newMessageRecieved) => {
-            if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id){
-
+            if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
+                if (!notification.includes(newMessageRecieved)) {
+                    setNotification([newMessageRecieved, ...notification]);
+                    setFetchAgain(!fetchAgain);
+                }
             } else {
                 setMessages([...messages, newMessageRecieved]);
             }
@@ -81,17 +85,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
 
     const sendMessage = async (e) => {
-        if (e.key === "Enter" && newMessage){
+        if (e.key === "Enter" && newMessage) {
             socket.emit('stop typing', selectedChat._id);
             try {
                 const config = {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${user.token}`, 
+                        Authorization: `Bearer ${user.token}`,
                     },
                 };
 
-                const {data} = await axios.post("http://localhost:5000/api/message/", 
+                const { data } = await axios.post("http://localhost:5000/api/message/",
                     {
                         content: newMessage,
                         chatId: selectedChat._id,
@@ -104,7 +108,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 socket.emit('new message', data);
                 setMessages([...messages, data]);
-            } catch (error){
+            } catch (error) {
                 toast({
                     title: "Error Occured!",
                     description: "Failed to send the Message",
@@ -120,9 +124,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const typingHandler = (e) => {
         setNewMessage(e.target.value);
 
-        if (!socketConnected)return;
+        if (!socketConnected) return;
 
-        if (!typing){
+        if (!typing) {
             setTyping(true);
             socket.emit('typing', selectedChat._id);
         }
@@ -133,7 +137,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             var timeNow = new Date().getTime();
             var timeDiff = timeNow - lastTypingTime;
 
-            if (timeDiff >= timerLength && typing){
+            if (timeDiff >= timerLength && typing) {
                 socket.emit('stop typing', selectedChat._id);
                 setTyping(false);
             }
@@ -158,31 +162,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         ) : (
                             <>
                                 {selectedChat.chatName.toUpperCase()}
-                                <UpdateGroup fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} fetchMessages={fetchMessages}/>
+                                <UpdateGroup fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} fetchMessages={fetchMessages} />
                             </>
                         )}
                     </Text>
                     <Box
                         display="flex"
-                        flexDir="column" justifyContent="flex-end" h="100%" w="100%" p={3}
+                        flexDir="column" justifyContent="flex-end" h="90%" w="100%" p={3}
                         bg="#E8E8E8"
                         borderRadius="lg" overflow="hidden">
-                            {loading ? (
-                                <Spinner
-                                    size="xl"
-                                    w={20}
-                                    h={20}
-                                    alignSelf="center"
-                                    margin="auto"
-                                ></Spinner>
-                            ):(
-                                <div style={{display:"flex", flexDirection: "column", overflowY: "scroll", scrollbarWidth: "none"}}>
-                                    <ScrollableChat messages={messages}></ScrollableChat>
-                                </div>
-                            )}
-                            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-                               {isTyping ? <div>Loading...</div>:<></>} <input style={{backgroundColor: "#E0E0E0", width: "100%", padding: "10px"}} placeholder='Enter message' onChange={typingHandler} value={newMessage}></input>
-                            </FormControl>
+                        {loading ? (
+                            <Spinner
+                                size="xl"
+                                w={20}
+                                h={20}
+                                alignSelf="center"
+                                margin="auto"
+                            ></Spinner>
+                        ) : (
+                            <div style={{ display: "flex", flexDirection: "column", overflowY: "scroll", scrollbarWidth: "none" }}>
+                                <ScrollableChat messages={messages}></ScrollableChat>
+                            </div>
+                        )}
+                        <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+                            {isTyping ? <div>Typing...</div> : <></>} <input style={{ backgroundColor: "#E0E0E0", width: "100%", padding: "10px" }} placeholder='Enter message' onChange={typingHandler} value={newMessage}></input>
+                        </FormControl>
                     </Box>
                 </>
             ) : (
