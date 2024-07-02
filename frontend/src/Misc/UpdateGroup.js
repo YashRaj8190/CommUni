@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Box, FormControl, Input, useDisclosure } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 import {
     Modal,
     ModalOverlay,
@@ -10,7 +10,6 @@ import {
     ModalBody,
     ModalCloseButton,
     IconButton,
-    Button,
     useToast,
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -196,36 +195,38 @@ const UpdateGroup = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>{selectedChat.chatName}</ModalHeader>
+                    <ModalHeader>Group Settings</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Box
-                            display="flex" flexWrap="wrap" w="100%" pb={3}
-                            borderRadius="lg">
+                        <div className='font-semibold'>Members</div>
+                        <div className="flex flex-wrap w-full pb-3 rounded-lg">
                             {selectedChat.users.map(u => (
                                 <UserBadgeItem key={u._id} user={u} handleFunction={() => handleRemove(u)} />
                             ))}
-                        </Box>
-                        <FormControl display="flex">
-                            <Input
-                                placeholder="Group Name"
-                                mb={3}
+                        </div>
+                        <div className="flex ">
+                            <input
+                                type="text"
+                                placeholder="Change Name"
+                                className="px-3 py-2 my-2 mb-3 border rounded-lg w-4/5"
                                 onChange={(e) => setGroupChatName(e.target.value)}
                             />
-                            <Button
-                                variant="solid" colorScheme="teal" ml={1} isLoading={renameLoad}
+                            <button
+                                className="px-2 my-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg ml-2"
+                                disabled={renameLoad}
                                 onClick={handleRename}
                             >
-                                Update
-                            </Button>
-                        </FormControl>
-                        <FormControl>
-                            <Input
-                                placeholder="Add new users"
-                                mb={1}
+                                {renameLoad ? 'Updating...' : 'Update'}
+                            </button>
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="Add new members"
+                                className="px-3 py-2 mb-1 border rounded-lg w-4/5"
                                 onChange={(e) => handleSearch(e.target.value)}
                             />
-                        </FormControl>
+                        </div>
 
                         {load ? (
                             <div className='justify-center'>Loading ...</div>
@@ -238,9 +239,12 @@ const UpdateGroup = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button colorScheme='red' mr={3} onClick={() => handleRemove(user)}>
+                        <button
+                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg mr-1"
+                            onClick={() => handleRemove(user)}
+                        >
                             Leave Group
-                        </Button>
+                        </button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

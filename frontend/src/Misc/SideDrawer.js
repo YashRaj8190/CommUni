@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Button,
-    Tooltip,
-    Menu,
-    MenuButton,
-    Avatar,
-    MenuList,
-    MenuItem,
-    MenuDivider,
-    Drawer,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerHeader,
-    DrawerBody,
-    Spinner,
-    Text,
-} from '@chakra-ui/react';
+import { Box, Button, Tooltip, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody, Spinner, Text } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faBell, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useHistory } from 'react-router-dom';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import axios from 'axios';
@@ -115,21 +98,24 @@ const SideDrawer = () => {
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                bg="white"
+                bg="#1f2d3d"
                 w="100%"
-                p="5px 10px 5px 10px"
-                borderWidth="5px"
+                color="white"
+                p="10px 10px 5px 10px"
+                borderWidth="0px"
             >
                 <Tooltip label="Search Users" hasArrow placement="bottom-end">
-                    <Button variant="ghost" onClick={onOpen}>
-                        <FontAwesomeIcon icon={faSearch} />
-                        <Text display={{ base: 'none', md: 'flex' }}>Search User</Text>
+                    <Button variant="ghost" onClick={onOpen} bg="white"  >
+                        <Text display={{ base: 'none', md: 'flex' }} ml={3}>Search User</Text>
+                        <Box as="span" ml={3} mr={3}>
+                            <FontAwesomeIcon icon={faSearch} />
+                        </Box>
                     </Button>
                 </Tooltip>
-                <Text>CommUni</Text>
+                <Text fontSize="2xl" fontWeight="semibold">CommUni</Text>
                 <div>
-                    <Menu>
-                        <MenuButton p={1} position="relative">
+                    <Menu className="bg-slate-700 text-white">
+                        <MenuButton p={1} position="relative" mx={5}>
                             <FontAwesomeIcon icon={faBell} fontSize="2x" />
                             {notification.length !== 0 && (
                                 <Box
@@ -151,13 +137,13 @@ const SideDrawer = () => {
                                 </Box>
                             )}
                         </MenuButton>
-                        <MenuList pl={2}>
-                            {!notification.length && <MenuItem>No new messages</MenuItem>}
+                        <MenuList bg="#1f2d3d" >
+                            {!notification.length && <MenuItem bg="#1f2d3d" color="white">No new messages</MenuItem>}
                             {[...new Map(notification.map(item => [item.chat._id, item])).values()].map(notif => {
                                 const messageCount = notification.filter(n => n.chat._id === notif.chat._id).length;
 
                                 return (
-                                    <MenuItem
+                                    <MenuItem bg="#1f2d3d" _hover={{ bg: "#4a5568" }} color="white"
                                         key={notif.chat._id}
                                         onClick={() => {
                                             setSelectedChat(notif.chat);
@@ -172,33 +158,33 @@ const SideDrawer = () => {
                         </MenuList>
                     </Menu>
                     <Menu>
-                        <MenuButton as={Button} rightIcon={<FontAwesomeIcon icon={faChevronDown} />}>
-                            <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} />
+                        <MenuButton mx={5}>
+                            <FontAwesomeIcon icon={faCog} />
                         </MenuButton>
-                        <MenuList>
+                        <MenuList bg="#1f2d3d">
                             <Profile user={user}>
-                                <MenuItem>My Profile</MenuItem>
+                                <MenuItem bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }} >My Profile</MenuItem>
                             </Profile>
-                            <MenuDivider />
-                            <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+                            {/* <MenuDivider /> */}
+                            <MenuItem onClick={logoutHandler} bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }}>Logout</MenuItem>
                         </MenuList>
                     </Menu>
                 </div>
             </Box>
             <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
                 <DrawerOverlay />
-                <DrawerContent>
-                    <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
+                <DrawerContent >
+                    <DrawerHeader borderBottomWidth="1px" bg="#4a5568" color="white">Search Users</DrawerHeader>
                     <DrawerBody>
-                        <Box display="flex" pb={2}>
+                        <Box display="flex" pb={2} >
                             <input
                                 placeholder="Search by name or email"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                style={{ border: 'none' }}
+                                className='pl-3 rounded-md w-full bg-gray-200 my-2'
                             />
                             <button
-                                className="text-blue-700 rounded-md py-2 my-2 px-2 w-full"
+                                className="bg-blue-600 text-white ml-2 rounded-md py-2 my-2 px-3 "
                                 onClick={handleSearch}
                             >
                                 Go

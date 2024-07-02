@@ -1,19 +1,15 @@
-import { Box, CloseButton } from '@chakra-ui/react';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const UserBadgeItem = ({ user, handleFunction }) => {
     return (
-        <Box
-            px={3} py={1} m={1} mb={2}
-            borderRadius="lg" variant="solid"
-            cursor="pointer" fontSize={12}
-            backgroundColor='purple'
+        <div className="px-3 py-2 my-1.5 mx-1 rounded-lg cursor-pointer text-sm bg-green-400 hover:bg-green-600 text-white flex items-center "
             onClick={handleFunction}
-            display="flex"
         >
-            {user.name}
-            <CloseButton pl={1} />
-        </Box>
+            <span className="mr-2 font-semibold">{user.name}</span>
+            <FontAwesomeIcon icon={faTimes} className="text-black" />
+        </div>
     );
 };
 

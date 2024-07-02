@@ -1,25 +1,22 @@
 import React from 'react';
-import { Avatar, Text } from "@chakra-ui/react";
+import { Avatar } from "@chakra-ui/react";
 
 const UserListItem = ({ user, handleFunction }) => {
     return (
-        <div
-            onClick={handleFunction}
-            style={{ cursor: "pointer", width: "100%", display: "flex", alignItems: "center", color: "black" }}
-        >
+        <div onClick={handleFunction}
+            className="cursor-pointer w-full flex items-center text-black" >
             <Avatar
-                mr={2}
+                mx={2}
                 size="sm"
                 cursor="pointer"
                 name={user.name}
                 src={user.pic}
-            ></Avatar>
+            />
             <div>
-                <Text>{user.name}</Text>
-                <Text fontSize="xs">
-                    <b>Email: </b>
-                    {user.email}
-                </Text>
+                <div className="text-base ">{user.name}</div>
+                <div className="text-xs">
+                    <b>Email: </b>{user.email}
+                </div>
             </div>
         </div>
     );

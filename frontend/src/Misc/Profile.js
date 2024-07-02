@@ -1,14 +1,14 @@
 import { useDisclosure } from "@chakra-ui/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
-import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Avatar } from "@chakra-ui/react";
 
 const Profile = ({ user, children }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      {children ? <span onClick={onOpen}>{children}</span> : (<FontAwesomeIcon icon={faEye} onClick={onOpen}></FontAwesomeIcon>)}
+      {children ? (<span onClick={onOpen}>{children}</span>) : (
+        <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} onClick={onOpen} />
+      )}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -18,11 +18,6 @@ const Profile = ({ user, children }) => {
             <img style={{ borderRadius: "20%" }} src={user.pic} alt={user.name}></img>
             <center><div>{user.email}</div></center>
           </ModalBody>
-          {/* <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter> */}
         </ModalContent>
       </Modal>
     </>

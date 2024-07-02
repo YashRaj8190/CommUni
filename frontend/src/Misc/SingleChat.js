@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { ChatState } from '../Context/chatProvider'
-import { Box, FormControl, IconButton, Spinner, Text, useToast } from '@chakra-ui/react'
+import { Box, IconButton, Spinner, Text, useToast } from '@chakra-ui/react'
 import { getSender, getSenderFull } from './config/chatLogic'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import UpdateGroup from './UpdateGroup'
 import Profile from './Profile'
 import axios from 'axios';
@@ -148,28 +149,39 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         <>
             {selectedChat ? (
                 <>
-                    <Text pb={3} px={3} fontSize={{ base: "28px", md: "30px" }} fontFamily="Work sans" w="100%" display="flex" alignItems="center" justifyContent={{ base: "space-between" }}>
-                        <IconButton
-                            d={{ base: "flex", md: "none" }}
-                            icon={<FontAwesomeIcon icon={faArrowLeft} />}
-                            onClick={() => setSelectedChat("")}
-                        />
+                    <div className="pb-2 px-3 text-lg md:text-xl  font-semibold font-WorkSans w-full flex items-center justify-between">
                         {!selectedChat.isGroupChat ? (
                             <>
-                                {getSender(user, selectedChat.users)}
-                                <Profile user={getSenderFull(user, selectedChat.users)} />
+                                <div className="flex items-center text-white">
+                                    <Profile user={getSenderFull(user, selectedChat.users)} />
+                                    <div className="px-4 text-2xl">
+                                        {getSender(user, selectedChat.users)}
+                                    </div>
+                                </div>
+                                <IconButton
+                                    d={{ base: "flex", md: "none" }}
+                                    icon={<FontAwesomeIcon icon={faTimes} />}
+                                    onClick={() => setSelectedChat("")}
+                                />
                             </>
                         ) : (
                             <>
-                                {selectedChat.chatName.toUpperCase()}
+                                <IconButton
+                                    d={{ base: "flex", md: "none" }}
+                                    icon={<FontAwesomeIcon icon={faArrowLeft} />}
+                                    onClick={() => setSelectedChat("")}
+                                />
+                                <span className='text-white'>
+                                    {selectedChat.chatName.toUpperCase()}
+                                </span>
                                 <UpdateGroup fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} fetchMessages={fetchMessages} />
                             </>
                         )}
-                    </Text>
+                    </div>
                     <Box
                         display="flex"
                         flexDir="column" justifyContent="flex-end" h="90%" w="100%" p={3}
-                        bg="#E8E8E8"
+                        bg="#2a3646"
                         borderRadius="lg" overflow="hidden">
                         {loading ? (
                             <Spinner
@@ -184,14 +196,21 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                 <ScrollableChat messages={messages}></ScrollableChat>
                             </div>
                         )}
-                        <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-                            {isTyping ? <div>Typing...</div> : <></>} <input style={{ backgroundColor: "#E0E0E0", width: "100%", padding: "10px" }} placeholder='Enter message' onChange={typingHandler} value={newMessage}></input>
-                        </FormControl>
+                        <div className="mt-3">
+                            {isTyping && <div className='text-white'>Typing...</div>}
+                            <input
+                                className="w-full py-2 px-3 bg-gray-100 rounded-lg"
+                                placeholder="Enter message"
+                                onChange={typingHandler}
+                                onKeyDown={sendMessage}
+                                value={newMessage}
+                            />
+                        </div>
                     </Box>
                 </>
             ) : (
                 <Box display="flex" alignItems="center" justifyContent="center" h="100%">
-                    <Text pb={3} fontSize="3xl" fontFamily="Work sans">Click on a user to start chatting.....</Text>
+                    <Text pb={3} fontSize="3xl" fontFamily="Work sans" color="white">Click on a user to start chatting .....</Text>
                 </Box>
             )}
         </>

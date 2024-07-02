@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, FormControl, Input, useDisclosure } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 import {
     Modal,
     ModalOverlay,
@@ -8,7 +8,6 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    Button,
     useToast
 } from '@chakra-ui/react';
 import { ChatState } from '../Context/chatProvider';
@@ -124,7 +123,7 @@ const GroupChatModal = ({ children }) => {
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader
-                        fontSize="35px"
+                        fontSize="30px"
                         fontFamily="Work sans"
                         d="flex"
                         justifyContent="center"
@@ -132,26 +131,26 @@ const GroupChatModal = ({ children }) => {
                     <ModalCloseButton />
                     <ModalBody
                         d="flex" flexDir="column" alignItems="center">
-                        <FormControl>
-                            <Input
+                        <form className="flex flex-col">
+                            <input
+                                className="mb-3 p-2 border border-gray-300 rounded"
                                 placeholder="Group Name"
-                                mb={3}
                                 onChange={(e) => setGroupChatName(e.target.value)}
                             />
-                            <Input
+                            <input
+                                className="mb-1 p-2 border border-gray-300 rounded"
                                 placeholder="Add Users"
-                                mb={1}
                                 onChange={(e) => handleSearch(e.target.value)}
                             />
-                        </FormControl>
-                        <Box w="100%" display="flex" flexWrap="wrap">
+                        </form>
+                        <div className="w-full flex flex-wrap mt-2">
                             {selectedUsers.map(u => (
                                 <UserBadgeItem key={u._id} user={u} handleFunction={() => handleDelete(u)} />
                             ))}
-                        </Box>
+                        </div>
 
                         {load ? (
-                            <div className='justify-center'>Loading ...</div>
+                            <div className='justify-center '>Loading ...</div>
                         ) : (
                             searchResult?.slice(0, 4).map(user => (
                                 <UserListItem key={user._id} user={user} handleFunction={() => handleGroup(user)} />
@@ -159,9 +158,12 @@ const GroupChatModal = ({ children }) => {
                         )}
                     </ModalBody>
                     <ModalFooter>
-                        <Button colorScheme='blue' onClick={handleSubmit}>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                            onClick={handleSubmit}
+                        >
                             Create Chat
-                        </Button>
+                        </button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

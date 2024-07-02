@@ -1,4 +1,4 @@
-import { Box, Stack, Text, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { ChatState } from "../Context/chatProvider";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -38,58 +38,63 @@ const MyChats = ({ fetchAgain }) => {
     };
 
     useEffect(() => {
+        if (selectedChat) {
+            const interval = setInterval(fetchChats, 5000);
+            return () => clearInterval(interval);
+        }
+    }, [selectedChat]);
+
+    useEffect(() => {
         setLoggedUser(JSON.parse(localStorage.getItem('user')));
         fetchChats();
     }, [fetchAgain]);
 
     return (
-        <Box
-            display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
-            flexDir="column"
-            alignItems="center"
-            p={3}
-            bg="white"
-            w={{ base: "100%", md: "31%" }}
-            borderRadius="lg"
-            borderWidth="1px"
-        >
-            <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="flex flex-col items-center p-3 w-full md:w-1/3 rounded-lg border border-gray-300 text-white" >
+            <div className="flex justify-between items-center w-full mx-2 mb-2 pl-2 font-bold">
                 My Chats
                 <GroupChatModal>
-                    <button style={{ display: "flex", padding: "10px", alignItems: "center" }}>
+                    <button className="flex items-center px-4 py-2 hover:bg-slate-700 hover:text-white rounded-lg">
                         New Group Chat
-                        <FontAwesomeIcon icon={faAdd}></FontAwesomeIcon>
+                        <span className="ml-3">
+                            <FontAwesomeIcon icon={faAdd} />
+                        </span>
                     </button>
                 </GroupChatModal>
             </div>
 
-            <div
-                style={{ display: "flex", flexDirection: "column", padding: "10px", backgroundColor: "#F8F8F8", width: "100%", height: "100%", borderRadius: "lg", overflowY: "hidden" }}
-            >
+            <div className="flex flex-col p-4 pr-2 bg-slate-700 w-full h-full rounded-lg overflow-hidden">
                 {chats ? (
-                    <Stack overflowY='scroll'>
+                    <div className="overflow-y-scroll">
                         {chats.map((chat) => (
-                            <Box
-                                onClick={() => setSelectedChat(chat)}
-                                cursor="pointer"
-                                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                                color={selectedChat === chat ? "white" : "black"}
-                                px={3}
-                                py={2}
-                                borderRadius="lg"
+                            <div
                                 key={chat._id}
-                            >
-                                <Text>
+                                onClick={() => setSelectedChat(chat)}
+                                className={`cursor-pointer px-3 py-2  rounded-lg mb-2 mr-2 ${selectedChat === chat ? "bg-green-400 text-white" : "bg-gray-100 text-black"
+                                    }`}>
+                                <div className="font-bold">
                                     {!chat.isGroupChat ? getSender(loggedUser, chat.users) : chat.chatName}
-                                </Text>
-                            </Box>
+                                </div>
+                                {chat.latestMessage && chat.latestMessage.content && (
+                                    <div className={`text-sm ${selectedChat === chat ? "text-white" : "text-gray-500"}`}>
+                                        {!chat.isGroupChat ? (
+                                            <b>You : </b>
+                                        ) : (
+                                            <b>{chat.latestMessage.sender.name} : </b>
+                                        )}
+                                        {chat.latestMessage.content.length > 30 ?
+                                            `${chat.latestMessage.content.substring(0, 30)}.....` :
+                                            chat.latestMessage.content}
+                                    </div>
+                                )}
+                            </div>
                         ))}
-                    </Stack>
+                    </div>
                 ) : (
-                    <Loading></Loading>
+                    <Loading />
                 )}
             </div>
-        </Box>
+        </div>
     );
 };
 
