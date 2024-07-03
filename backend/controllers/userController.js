@@ -52,18 +52,55 @@ const userLogin = async (req, res) => {
     });
 };
 
-const allUsers = asyncHandler(async(req, res) => {
-    const keyword = req.query.search 
-    ? {
-        $or: [
-            {name: { $regex: req.query.search, $options: "i"}},
-            {email: { $regex: req.query.search, $options: "i"}},
-        ]
-    }
-    : {};
+const allUsers = asyncHandler(async (req, res) => {
+    const keyword = req.query.search
+        ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { email: { $regex: req.query.search, $options: "i" } },
+            ]
+        }
+        : {};
 
-    const users = await User.find(keyword).find({_id:{$ne: req.user._id }});
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
     res.send(users);
 });
 
-module.exports = { userSignUp, userLogin, allUsers };
+const renameUser = asyncHandler(async (req, res) => {
+    const { userId, newUsername } = req.body;
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        user.name = newUsername;
+        await user.save();
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+
+const updateUserPassword = asyncHandler(async (req, res) => {
+    const { userId, newPassword } = req.body;
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+
+module.exports = { userSignUp, userLogin, allUsers, renameUser, updateUserPassword };

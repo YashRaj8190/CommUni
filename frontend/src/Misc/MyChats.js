@@ -77,10 +77,21 @@ const MyChats = ({ fetchAgain }) => {
                                 </div>
                                 {chat.latestMessage && chat.latestMessage.content && (
                                     <div className={`text-sm ${selectedChat === chat ? "text-white" : "text-gray-500"}`}>
-                                        {!chat.isGroupChat ? (
-                                            <b>You : </b>
-                                        ) : (
-                                            <b>{chat.latestMessage.sender.name} : </b>
+                                        {!chat.isGroupChat && (
+                                            <>
+                                                {chat.latestMessage.sender.name === user.name ? (
+                                                    <b>You : </b>
+                                                ) : (
+                                                    <b> </b>
+                                                )}
+                                            </>
+                                        )}
+                                        {chat.isGroupChat && (
+                                            <>
+                                                {chat.latestMessage.sender.name === user.name ?
+                                                    (<b>You : </b>) : (<b>{chat.latestMessage.sender.name} : </b>)
+                                                }
+                                            </>
                                         )}
                                         {chat.latestMessage.content.length > 30 ?
                                             `${chat.latestMessage.content.substring(0, 30)}.....` :

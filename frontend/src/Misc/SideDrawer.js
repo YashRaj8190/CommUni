@@ -1,25 +1,40 @@
 import React, { useState } from 'react';
-import { Box, Button, Tooltip, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody, Spinner, Text } from '@chakra-ui/react';
+import {
+    Box, Button, Tooltip, Menu, MenuButton, MenuList, MenuItem,
+    Drawer, DrawerOverlay, DrawerContent, DrawerHeader, DrawerBody,
+    Spinner, Text, useToast,
+} from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faBell, faCog, faUser, faCogs, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useHistory } from 'react-router-dom';
-import { useDisclosure, useToast } from '@chakra-ui/react';
+import { useDisclosure } from '@chakra-ui/react';
 import axios from 'axios';
 import Profile from './Profile';
 import Loading from './Loading';
 import UserListItem from './UserListItem';
 import { getSender } from './config/chatLogic';
 import { ChatState } from '../Context/chatProvider';
+import UpdateProfile from './UpdateProfile';
 
 const SideDrawer = () => {
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingChat, setLoadingChat] = useState(false);
+    const [fetchAgain, setFetchAgain] = useState(false);
 
     const { user, setSelectedChat, chats, setChats, notification, setNotification } = ChatState();
     const history = useHistory();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isDrawerOpen,
+        onOpen: onDrawerOpen,
+        onClose: onDrawerClose,
+    } = useDisclosure();
+    const {
+        isOpen: isModalOpen,
+        onOpen: onModalOpen,
+        onClose: onModalClose,
+    } = useDisclosure();
     const toast = useToast();
 
     const logoutHandler = () => {
@@ -79,7 +94,7 @@ const SideDrawer = () => {
             if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
             setSelectedChat(data);
             setLoadingChat(false);
-            onClose();
+            onDrawerClose();
         } catch (error) {
             toast({
                 title: 'Error fetching the chat',
@@ -105,7 +120,7 @@ const SideDrawer = () => {
                 borderWidth="0px"
             >
                 <Tooltip label="Search Users" hasArrow placement="bottom-end">
-                    <Button variant="ghost" onClick={onOpen} bg="white"  >
+                    <Button variant="ghost" onClick={onDrawerOpen} bg="white">
                         <Text display={{ base: 'none', md: 'flex' }} ml={3}>Search User</Text>
                         <Box as="span" ml={3} mr={3}>
                             <FontAwesomeIcon icon={faSearch} />
@@ -114,7 +129,7 @@ const SideDrawer = () => {
                 </Tooltip>
                 <Text fontSize="2xl" fontWeight="semibold">CommUni</Text>
                 <div>
-                    <Menu className="bg-slate-700 text-white">
+                    <Menu>
                         <MenuButton p={1} position="relative" mx={5}>
                             <FontAwesomeIcon icon={faBell} fontSize="2x" />
                             {notification.length !== 0 && (
@@ -137,21 +152,22 @@ const SideDrawer = () => {
                                 </Box>
                             )}
                         </MenuButton>
-                        <MenuList bg="#1f2d3d" >
+                        <MenuList bg="#1f2d3d">
                             {!notification.length && <MenuItem bg="#1f2d3d" color="white">No new messages</MenuItem>}
                             {[...new Map(notification.map(item => [item.chat._id, item])).values()].map(notif => {
                                 const messageCount = notification.filter(n => n.chat._id === notif.chat._id).length;
-
                                 return (
-                                    <MenuItem bg="#1f2d3d" _hover={{ bg: "#4a5568" }} color="white"
+                                    <MenuItem
                                         key={notif.chat._id}
+                                        bg="#1f2d3d"
+                                        _hover={{ bg: "#4a5568" }}
+                                        color="white"
                                         onClick={() => {
                                             setSelectedChat(notif.chat);
                                             setNotification(notification.filter(n => n.chat._id !== notif.chat._id));
                                         }}
                                     >
-                                        {`${messageCount} new message${messageCount !== 1 ? 's' : ''} from ${notif.chat.isGroupChat ? notif.chat.chatName : getSender(user, notif.chat.users)
-                                            }`}
+                                        {`${messageCount} new message${messageCount !== 1 ? 's' : ''} from ${notif.chat.isGroupChat ? notif.chat.chatName : getSender(user, notif.chat.users)}`}
                                     </MenuItem>
                                 );
                             })}
@@ -163,20 +179,27 @@ const SideDrawer = () => {
                         </MenuButton>
                         <MenuList bg="#1f2d3d">
                             <Profile user={user}>
-                                <MenuItem bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }} >My Profile</MenuItem>
+                                <MenuItem bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }}>
+                                    <FontAwesomeIcon icon={faUser} className='mr-5' />My Profile
+                                </MenuItem>
                             </Profile>
-                            {/* <MenuDivider /> */}
-                            <MenuItem onClick={logoutHandler} bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }}>Logout</MenuItem>
+                            <MenuItem onClick={onModalOpen} bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }}>
+                                <FontAwesomeIcon icon={faCogs} className='mr-4' />Update Profile
+                            </MenuItem>
+                            <MenuItem onClick={logoutHandler} bg="#1f2d3d" color="white" _hover={{ bg: "#4a5568" }}>
+                                <FontAwesomeIcon icon={faSignOutAlt} className='mr-5' />
+                                Logout
+                            </MenuItem>
                         </MenuList>
                     </Menu>
                 </div>
             </Box>
-            <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+            <Drawer placement="left" onClose={onDrawerClose} isOpen={isDrawerOpen}>
                 <DrawerOverlay />
-                <DrawerContent >
+                <DrawerContent>
                     <DrawerHeader borderBottomWidth="1px" bg="#4a5568" color="white">Search Users</DrawerHeader>
                     <DrawerBody>
-                        <Box display="flex" pb={2} >
+                        <Box display="flex" pb={2}>
                             <input
                                 placeholder="Search by name or email"
                                 value={search}
@@ -184,7 +207,7 @@ const SideDrawer = () => {
                                 className='pl-3 rounded-md w-full bg-gray-200 my-2'
                             />
                             <button
-                                className="bg-blue-600 text-white ml-2 rounded-md py-2 my-2 px-3 "
+                                className="bg-blue-600 text-white ml-2 rounded-md py-2 my-2 px-3"
                                 onClick={handleSearch}
                             >
                                 Go
@@ -205,6 +228,7 @@ const SideDrawer = () => {
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>
+            <UpdateProfile isOpen={isModalOpen} onClose={onModalClose} fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
         </>
     );
 };
